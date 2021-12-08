@@ -1,0 +1,1 @@
+{"maquina":"Cliente_1","sintomas":[["DoS"],["DoS"],["Exploits"],["DoS"]],"plan":"10.40.5.96,BlockIP;10.40.5.9,BlockIP;http,ClosePort;10.40.5.16,BlockIP;"}
