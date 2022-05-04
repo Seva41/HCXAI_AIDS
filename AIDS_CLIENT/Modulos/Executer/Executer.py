@@ -18,6 +18,9 @@ RUTA_LOG = config['EXECUTER']['RUTA_LOG']
 MAQUINA = config['CLIENTE']['MAQUINA']
 
 VALID_NAMES = ["ClosePort", "OpenPort", "ScanPort", "BlockIP"]
+
+URL = "http://192.168.0.15:5555/pushclientlogtabla"
+
 class Executer:
     def __init__(self):
         self.entrada = ""
@@ -110,12 +113,12 @@ class Executer:
                 logger.handlers.clear()
             logger.addHandler(handler)
             logger.info('Funcion: {} \t puerto/ip: {} \t Fecha: {} \t Hora: {} \t Sintoma: {}'.format(name, port, fecha, hora, sintoma))
-            r = requests.post("http://104.131.83.178:5555/pushclientlogtabla", data=payload, headers=headers)
+            r = requests.post(URL, data=payload, headers=headers)
             sleep(1)
         except FileNotFoundError:
             file = open(RUTA_LOG, 'w')
             file.write('Funcion: {} \t puerto/ip: {} \t Fecha: {} \t Hora: {} \t Sintoma: {}'.format(name, port, fecha, hora, sintoma))
-            r = requests.post("http://104.131.83.178:5555/pushclientlogtabla", data=payload, headers=headers)
+            r = requests.post(URL, data=payload, headers=headers)
             file.close()
             sleep(1)
         except:

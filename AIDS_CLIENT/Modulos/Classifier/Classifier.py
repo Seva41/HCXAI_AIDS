@@ -16,6 +16,8 @@ RUTA_SNIFF = config['CLASSIFIER']['RUTA_SNIFF']
 RUTA_LOG = config['CLASSIFIER']['RUTA_LOG']   
 RUTA_MODELS = config['CLASSIFIER']['RUTA_MODELS']
 
+url = ["http://192.168.0.15:5555/pushdatanew", "http://192.168.0.15:5555/pushdataappend"]
+
 class Classifier:
     def __init__(self, maquina):
         self.__maquina = maquina
@@ -94,7 +96,6 @@ class Classifier:
     def __logWebService(self, port, aType, date, hora, ip, mode):
         #mode = 1: cuando es la primera vez que se ejecuta la función
         #mode = 2: cuando no es la primera vez que se ejecuta
-        url = ["http://104.131.83.178:5555/pushdatanew", "http://104.131.83.178:5555/pushdataappend"]
         data = []
         data.append({"maquina": self.__maquina})
         dic = {
@@ -109,8 +110,10 @@ class Classifier:
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'} 
         if mode == 1:
             r = requests.post(url[0], data=payload, headers=headers)
+            print(r.text)
         elif mode >= 2:
             r = requests.post(url[1], data=payload, headers=headers)
+            print (r.text)
         else:
             pass
 

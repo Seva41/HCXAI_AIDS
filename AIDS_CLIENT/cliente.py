@@ -16,7 +16,11 @@ config.read("config.ini")
 FILE = config['CLIENTE']['FILE']
 MAQUNA = config['CLIENTE']['MAQUINA']
 MONITOREO = int(config['CLIENTE']['SCAN_SEGUNDOS'])
-url = ["http://104.131.83.178:5555/pushclientdone", "http://104.131.83.178:5555/plans/"+MAQUNA+".json"]
+url = [
+    "http://192.168.0.15:5555/pushclientdone", 
+    "http://192.168.0.15:5555/plans/"+MAQUNA+".json",
+    "http://192.168.0.15:5555/pushclientlogstats"
+]
 
 def getFileData():
     data = []
@@ -71,7 +75,7 @@ def log(componente, func):
     logData.append(dic)
     payload = json.dumps(logData)
     headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-    r = requests.post("http://104.131.83.178:5555/pushclientlogstats", data=payload, headers=headers)
+    r = requests.post(url[2], data=payload, headers=headers)
     
     
 #####
@@ -106,7 +110,6 @@ while(True):
 
     intentos = 1
     conn = False
-
     while intentos <= 3:
         try:
             respuesta = consumirServicio(tipo = 1, url = url[0])
