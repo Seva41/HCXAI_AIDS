@@ -1,25 +1,18 @@
-// const express = require('express');
-// const app = express();
-
-// app.get('/test', (req, res) => {
-//   res.send('wenas!');
-// });
-
-// // Listen to the App Engine-specified port, or 8080 otherwise
-// const PORT = process.env.PORT || 8080;
-// app.listen(PORT, () => {
-//   console.log(`Server listening on port ${PORT}...`);
-// });
-
 const express = require('express')
+const bodyParser = require('body-parser');
+const fs = require('fs');
+
 const Router = express.Router()
 Router.use("/",express.static("./MDCV-WebService"))
 const app = express()
 
 app.use("/",Router)
+app.use(bodyParser.json());
+
 const PORT = 5555;
 
 /*=======================================================*/
+
 
 app.get('/', function (req, res) {
   console.log("HA OCURRIDO UNA CONEXION DESDE ALGUN DISPOSITIVO...");
@@ -104,7 +97,6 @@ app.post("/pushserverdone",(req,res)=>{
 app.post("/pushdatanew",(req,res)=>{
     let json = req.body
     let size = Object.keys(json).length;
-
     if(size !== 0){
         res.send({
             "json request size":size,

@@ -1,1 +1,1 @@
-{"maquina":"Cliente_1","sintomas":[["DoS"],["DoS"],["Exploits"],["DoS"]],"plan":"10.40.5.96,BlockIP;10.40.5.9,BlockIP;http,ClosePort;10.40.5.16,BlockIP;"}
+{"maquina":"Cliente_1","plan":"2800:150:14c:697:*,BlockIP;54915,ClosePort;50001,ClosePort;https,ClosePort;51612,ClosePort.CUARENTENA;domain,CUARENTENA;27018,ClosePort;54760,ClosePort.CUARENTENA;","sintomas":[["DoS"],["Exploits"],["Exploits"],["Exploits"],["Exploits","Generic"],["Generic"],["Exploits"],["Exploits","Generic"]]}
