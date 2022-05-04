@@ -10,6 +10,7 @@ CLOSE_PORT_RESPONSES = ["Backdoor", "Exploits", "Shellcode"]
 BLOCK_IP_RESPONSES = ["DoS", "Fuzzers"]
 CUARENTENA_RESPONSES = ["Worms", "Generic"]
 
+URL = "http://192.168.0.15:5555/pushsintomas"
 '''
 por ahora, solo recibe los puertos.
 
@@ -99,5 +100,5 @@ class Planner:
         logData.append(dic)
         payload = json.dumps(logData)
         headers = {'Content-type': 'application/json', 'Accept': 'text/plain'}
-        r = requests.post("http://104.131.83.178:5555/pushsintomas", data=payload, headers=headers)
+        r = requests.post(URL, data=payload, headers=headers)
         return r.text

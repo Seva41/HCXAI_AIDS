@@ -17,10 +17,10 @@ RUTA_REGISTRO_ATAQUES =  config['ANALYZER']['RUTA_ATAQUES_PROCESADOS']
 RUTA_DATAINFO = config['SERVER']['RUTA_DATA_INFO']
 SERVER_LOG = config['SERVER']['SERVER_LOG']
 url = [
-    "http://104.131.83.178:5555/pushserverdone", #0
-    "http://104.131.83.178:5555/plkpjhbx/", #1
-    "http://104.131.83.178:5555/filaclientes/fila_clientes.txt", #2
-    "http://104.131.83.178:5555/pushplan" #3
+    "http://192.168.0.15:5555/pushserverdone", #0
+    "http://192.168.0.15:5555/plkpjhbx/", #1
+    "http://192.168.0.15:5555/filaclientes/fila_clientes.txt", #2
+    "http://192.168.0.15:5555/pushplan" #3
     ]
 def log(componente, func):
     now = dt.datetime.today()
@@ -118,7 +118,7 @@ while(True):
                     "sintomas": sintomas
                 }
                 planes.append(p)
-            postServer("http://104.131.83.178:5555/pushplan", json.dumps(planes))
+            postServer(url[3], json.dumps(planes))
             tt.sleep(1)
             consumirServicio(tipo=1, url= url[0], text=json.dumps([{"server":"ok"}]))
             tt.sleep(2)

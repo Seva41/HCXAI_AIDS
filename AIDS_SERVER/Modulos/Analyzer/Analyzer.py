@@ -123,7 +123,7 @@ class Analyzer:
         self.writeDataCsv(mensaje="Generando resultados del analisis de incidencias v/s ventana de tiempo...", tipo = 2, args=dictAtaques)
         print("Analisis realizado correctamente...")
 
-            
+    #comentario 04/05/2022 todo esto puede hacerse super facil con datetime y deltatime, en ese tiempo no lo sabia xD
     '''
         Parámetros:
                     fechaPrimera: string
