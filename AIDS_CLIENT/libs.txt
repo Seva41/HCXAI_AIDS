@@ -1,0 +1,8 @@
+pandas
+scapy
+graypy
+joblib
+sklearn
+xgboost==1.2.0
+numpy==1.19.3
+requests
