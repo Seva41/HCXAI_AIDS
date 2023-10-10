@@ -1,4 +1,4 @@
-# Instrucciones de instalación:
+# Instrucciones de instalación (OBSOLETO - VER PDF TUTORIAL)
 
 ## Windows:
 
