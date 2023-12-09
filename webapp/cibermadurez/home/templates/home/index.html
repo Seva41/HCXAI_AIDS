@@ -27,7 +27,7 @@
         <button class="login-btn">Login</button>
     </div>
     <center>
-        <h1>Bienvenido a HC-AIDS</h1>
+        <h1><strong>Bienvenido a HC-AIDS</strong></h1>
     </center><br><br>
     <center>
         <h3>¿Qué desea consultar?</h3>
@@ -38,6 +38,28 @@
             <li class="custom-button" onclick="window.location='/tabla'">Acciones aplicadas a los equipos</li>
             <li class="custom-button" onclick="window.location='/stats/'">Logs</li>
         </ul>
+        <table>
+            <tr>
+                <th>¿Qué hizo el sistema?</th>
+            </tr>
+            <tr>
+                <td>Cierre de puertos <strong><span class="highlight_r">20</span></strong>, <strong><span
+                            class="highlight_r">21</span></strong> y
+                    <strong><span class="highlight_g">25</span></strong>.
+                </td>
+            </tr>
+        </table>
+
+        <table>
+            <tr>
+                <th>¿Por qué hizo aquello?</th>
+            </tr>
+            <tr>
+                <td>Alto flujo de paquetes <strong><span class="highlight_r">FTP</span></strong> y <strong><span
+                            class="highlight_g">SMTP</span></strong>.
+                </td>
+            </tr>
+        </table>
     </div>
 </body>
 
@@ -46,7 +68,8 @@
 
 <style type='text/css'>
     body {
-        background-color: rgb(210, 234, 241);
+        background: linear-gradient(#e7e7ee, #297096);
+        background-attachment: fixed;
     }
 
     .content ul {
@@ -126,5 +149,39 @@
 
     .content {
         margin-right: 600px;
+    }
+
+    table {
+        margin-left: 300px;
+        margin-top: 80px;
+        /* Mueve las tablas un poco más abajo */
+        margin-bottom: 1px;
+        /* Añade un espacio entre las tablas */
+        width: 30%;
+        /* Reduce el ancho de las tablas */
+        border-collapse: separate;
+        border-spacing: 0;
+        border-radius: 10px;
+        overflow: hidden;
+    }
+
+    th {
+        background: linear-gradient(to right, #000080, #7e87c2);
+        color: white;
+        padding: 10px;
+    }
+
+    td {
+        background: linear-gradient(to left, #bdbdd5, #5865bd);
+        color: white;
+        padding: 10px;
+    }
+
+    .highlight_r {
+        color: rgb(171, 5, 5);
+    }
+
+    .highlight_g {
+        color: rgb(0, 128, 0);
     }
 </style>
