@@ -6,10 +6,10 @@ from urllib import request as UR
 import requests
 import socket
 
-local_ipv4 = socket.gethostbyname(socket.gethostname())
+#local_ipv4 = socket.gethostbyname(socket.gethostname())
 
 # Create your views here.
-url = [f"http://{local_ipv4}:5555/aidsclilogs/tabla/"]
+url = [f"http://172.26.103.4:5555/aidsclilogs/tabla/"]
 
 
 def index(request):
