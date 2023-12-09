@@ -30,13 +30,13 @@
         <h1>Bienvenido a HC-AIDS</h1>
     </center><br><br>
     <center>
-        <h3>¿Qué deseas consultar?</h3>
+        <h3>¿Qué desea consultar?</h3>
     </center><br><br>
     <img src="{% static 'output.png' %}" alt="Output Image" class="output-img">
     <div class="content">
         <ul>
-            <li onclick="window.location='/tabla'">Acciones aplicadas a los equipos</li>
-            <li onclick="window.location='/stats/'">Logs</li>
+            <li class="custom-button" onclick="window.location='/tabla'">Acciones aplicadas a los equipos</li>
+            <li class="custom-button" onclick="window.location='/stats/'">Logs</li>
         </ul>
     </div>
 </body>
@@ -49,26 +49,36 @@
         background-color: rgb(210, 234, 241);
     }
 
-    li {
-        font-size: 30px;
-        text-align: center;
-        line-height: 100px;
+    .content ul {
         list-style: none;
-        width: 50%;
-        margin: auto;
+        padding: 0;
     }
 
-    li:hover {
+    .content ul li {
+        font-size: 20px;
+        /* Reduce el tamaño de la fuente */
+        text-align: center;
+        line-height: 50px;
+        /* Reduce la altura de la línea */
+        list-style: none;
+        width: 40%;
+        /* Reduce el ancho del botón */
+        margin: 10px auto;
+        /* Añade un margen en la parte superior e inferior para evitar el solapamiento */
+        background-color: #2b498b;
+        color: white;
+        padding: 10px 20px;
+        /* Reduce el padding */
+        text-decoration: none;
+        display: block;
         cursor: pointer;
-        color: blue;
+        border-radius: 12px;
+        transition-duration: 0.4s;
     }
 
-    li::before {
-        content: "•";
-        /* Insert content that looks like bullets */
-        padding-right: 8px;
-        color: rgb(0, 0, 0);
-        /* Or a color you prefer */
+    .content {
+        margin-right: 500px;
+        /* Reduce el margen derecho para mover los botones hacia la derecha */
     }
 
     .topnav {
@@ -76,7 +86,6 @@
         overflow: hidden;
     }
 
-    /* Style the links inside the navigation bar */
     .topnav a {
         float: left;
         color: #f2f2f2;
@@ -86,43 +95,36 @@
         font-size: 17px;
     }
 
-    /* Change the color of links on hover */
     .topnav a:hover {
         background-color: #ddd;
         color: black;
     }
 
-    /* Add a color to the active/current link */
     .topnav a.active {
         background-color: #04AA6D;
         color: white;
     }
 
-    /* Right-aligned section inside the top navigation */
     .login-btn {
         float: right;
         background-color: rgb(125, 177, 216);
         border: none;
         color: white;
         padding: 12px 26px;
-        /* Aumenta el padding para hacer el botón más grande */
         font-size: 20px;
-        /* Aumenta el tamaño de la fuente */
         border-radius: 12px;
-        /* Añade bordes redondeados al botón */
     }
 
     .output-img {
         position: absolute;
         right: 100px;
-        /* Ajusta este valor para mover la imagen más cerca o más lejos del borde derecho */
         top: 200px;
-        /* Ajusta este valor para mover la imagen más arriba o más abajo */
         width: 500px;
+        border: 6px solid #333;
+        border-radius: 5px;
     }
 
     .content {
-        margin-right: 900px;
-        /* Ajusta este valor para mover el contenido más a la izquierda o más a la derecha */
+        margin-right: 600px;
     }
 </style>
