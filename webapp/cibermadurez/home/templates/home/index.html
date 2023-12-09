@@ -38,28 +38,32 @@
             <li class="custom-button" onclick="window.location='/tabla'">Acciones aplicadas a los equipos</li>
             <li class="custom-button" onclick="window.location='/stats/'">Logs</li>
         </ul>
-        <table>
-            <tr>
-                <th>¿Qué hizo el sistema?</th>
-            </tr>
-            <tr>
-                <td>Cierre de puertos <strong><span class="highlight_r">20</span></strong>, <strong><span
-                            class="highlight_r">21</span></strong> y
-                    <strong><span class="highlight_g">25</span></strong>.
-                </td>
-            </tr>
-        </table>
+        <div class="table-wrapper">
+            <table>
+                <tr>
+                    <th>¿Qué hizo el sistema?</th>
+                </tr>
+                <tr>
+                    <td>Cierre de puertos <strong><span class="highlight_r">20</span></strong>, <strong><span
+                                class="highlight_r">21</span></strong> y
+                        <strong><span class="highlight_g">25</span></strong>.
+                    </td>
+                </tr>
+            </table>
+        </div>
 
-        <table>
-            <tr>
-                <th>¿Por qué hizo aquello?</th>
-            </tr>
-            <tr>
-                <td>Alto flujo de paquetes <strong><span class="highlight_r">FTP</span></strong> y <strong><span
-                            class="highlight_g">SMTP</span></strong>.
-                </td>
-            </tr>
-        </table>
+        <div class="table-wrapper">
+            <table>
+                <tr>
+                    <th>¿Por qué hizo aquello?</th>
+                </tr>
+                <tr>
+                    <td>Alto flujo de paquetes <strong><span class="highlight_r">FTP</span></strong> y <strong><span
+                                class="highlight_g">SMTP</span></strong>.
+                    </td>
+                </tr>
+            </table>
+        </div>
     </div>
 </body>
 
@@ -151,11 +155,22 @@
         margin-right: 600px;
     }
 
+    .content ul li {
+        font-size: 20px;
+        transition: background-color 0.5s ease;
+        /* Añade una transición al color de fondo */
+    }
+
+    .content ul li:hover {
+        background-color: #4278b3;
+        /* Cambia el color de fondo cuando se pasa el mouse por encima */
+    }
+
     table {
         margin-left: 300px;
         margin-top: 80px;
         /* Mueve las tablas un poco más abajo */
-        margin-bottom: 1px;
+        margin-bottom: 10px;
         /* Añade un espacio entre las tablas */
         width: 30%;
         /* Reduce el ancho de las tablas */
@@ -163,6 +178,11 @@
         border-spacing: 0;
         border-radius: 10px;
         overflow: hidden;
+    }
+
+    .table-wrapper {
+        margin-bottom: -50px;
+        /* Ajusta el espacio entre las tablas */
     }
 
     th {
