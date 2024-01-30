@@ -12,7 +12,7 @@ import time as t
 import configparser
 import socket
 
-local_ipv4 = socket.gethostbyname(socket.gethostname())
+local_ipv4 = "192.168.0.11"
 
 config = configparser.ConfigParser()
 config.read("config.ini")
