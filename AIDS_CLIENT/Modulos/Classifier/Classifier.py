@@ -21,6 +21,7 @@ RUTA_MODELS = config["CLASSIFIER"]["RUTA_MODELS"]
 url = [
     f"http://{local_ipv4}:5555/pushdatanew",
     f"http://{local_ipv4}:5555/pushdataappend",
+    f"http://{local_ipv4}:5555/pushclientdone",
 ]
 
 

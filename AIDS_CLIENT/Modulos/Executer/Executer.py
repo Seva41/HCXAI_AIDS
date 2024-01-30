@@ -22,7 +22,11 @@ MAQUINA = config["CLIENTE"]["MAQUINA"]
 
 VALID_NAMES = ["ClosePort", "OpenPort", "ScanPort", "BlockIP"]
 
-URL = f"http://{local_ipv4}:5555/pushclientlogtabla"
+URL = [
+    f"http://{local_ipv4}:5555/pushdatanew",
+    f"http://{local_ipv4}:5555/pushdataappend",
+    f"http://{local_ipv4}:5555/pushclientlogtabla",
+]
 
 
 class Executer:

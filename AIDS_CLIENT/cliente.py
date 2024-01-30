@@ -2,12 +2,16 @@ from Modulos.Sensor.Sensor import Sensor
 from Modulos.Preprocessing.Preprocessing import Preprocessing
 from Modulos.Classifier.Classifier import Classifier
 from Modulos.Executer.Executer import Executer
+from Modulos.Analyzer.Analyzer import Analyzer
+from Modulos.Planner.Planner import Planner
 
 import datetime as dt
 import logging
 import json
 from urllib import request
-import requests
+
+# import requests
+import server
 import time as t
 import configparser
 import socket
@@ -23,6 +27,7 @@ url = [
     f"http://{local_ipv4}:5555/pushclientdone",
     f"http://{local_ipv4}:5555/plans/{MAQUNA}.json",
     f"http://{local_ipv4}:5555/pushclientlogstats",
+    f"http://{local_ipv4}:5555/pushserverdone",
 ]
 
 
@@ -145,6 +150,55 @@ while True:
                 print("Medidas aplicadas.")
             else:
                 print("No se aplicaron medidas.")
+
+        try:
+            fila = consumirServicio(tipo=2, url=url[2])
+            log("server", "consumirServicio")
+            if "" in fila:
+                fila.remove("")
+            if fila == ["ok"]:
+                print("Esperando...")
+                t.sleep(2)
+            else:
+                for cliente in fila:
+                    data = consumirServicio(tipo=2, url=url[1] + cliente + ".txt")
+                    writeFile(data)
+                    log("server", "writeFile")
+
+                    print("Analyzer")
+                    an = Analyzer()
+
+                    # ... (Rest of the code remains the same)
+
+                    print("Planner")
+                    print("\n\tGenerando plan para {}".format(cliente))
+                    p = Planner(RUTA_REGISTRO_ATAQUES, cliente)
+                    plan, sintomas = p.getFileInfo()
+                    log("Planner", "getFileInfo")
+
+                    print("Plan generado satisfactoriamente...")
+                    t.sleep(2)
+                    p = {"maquina": cliente, "plan": plan, "sintomas": sintomas}
+                    planes.append(p)
+                postServer(url[3], json.dumps(planes))
+                t.sleep(1)
+                consumirServicio(
+                    tipo=1, url=url[0], text=json.dumps([{"server": "ok"}])
+                )
+                t.sleep(2)
+                attempts = 0
+                segundos = 1
+        except TypeError:
+            attempts += 1
+        segundos += 3
+        print("\n\nNo se puede establecer conexión con servicios web...")
+        print("Si el problema persiste contacte al administrador...")
+        print(
+            "Volviendo a intentar en {} segundos... Intentos: {}".format(
+                segundos, attempts
+            )
+        )
+        tt.sleep(segundos)
     else:
         print(
             "No es posible conectarse con el servidor. Pongase en contacto con el administrador."
