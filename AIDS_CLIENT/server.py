@@ -105,43 +105,48 @@ while True:
     try:
         fila = consumirServicio(tipo=2, url=url[2])
         log("server", "consumirServicio")
-        if "" in fila:
-            fila.remove("")
-        if fila == ["ok"]:
-            print("Esperando...")
-            tt.sleep(2)
-        else:
-            for cliente in fila:
-                data = consumirServicio(tipo=2, url=url[1] + cliente + ".txt")
-                writeFile(data)
-                log("server", "writeFile")
 
-                print("Analyzer")
-                an = Analyzer()
-
-                an.generateList()
-                log("Analyzer", "generateList")
-                an.writeDataCsv(tipo=1, mensaje="Generando registro de ataques...")
-                log("Analyzer", "writeDataCsv")
-                an.processData()
-                log("Analyzer", "processData")
-
-                print("Planner")
-                print("\n\tGenerando plan para {}".format(cliente))
-                p = Planner(RUTA_REGISTRO_ATAQUES, cliente)
-                plan, sintomas = p.getFileInfo()
-                log("Planner", "getFileInfo")
-
-                print("Plan generado satisfactoriamente...")
+        # Comprobación para evitar operaciones con None
+        if fila is not None:
+            if "" in fila:
+                fila.remove("")
+            if fila == ["ok"]:
+                print("Esperando...")
                 tt.sleep(2)
-                p = {"maquina": cliente, "plan": plan, "sintomas": sintomas}
-                planes.append(p)
-            postServer(url[3], json.dumps(planes))
-            tt.sleep(1)
-            consumirServicio(tipo=1, url=url[0], text=json.dumps([{"server": "ok"}]))
-            tt.sleep(2)
-            attempts = 0
-            segundos = 1
+            else:
+                for cliente in fila:
+                    data = consumirServicio(tipo=2, url=url[1] + cliente + ".txt")
+                    writeFile(data)
+                    log("server", "writeFile")
+
+                    print("Analyzer")
+                    an = Analyzer()
+
+                    an.generateList()
+                    log("Analyzer", "generateList")
+                    an.writeDataCsv(tipo=1, mensaje="Generando registro de ataques...")
+                    log("Analyzer", "writeDataCsv")
+                    an.processData()
+                    log("Analyzer", "processData")
+
+                    print("Planner")
+                    print("\n\tGenerando plan para {}".format(cliente))
+                    p = Planner(RUTA_REGISTRO_ATAQUES, cliente)
+                    plan, sintomas = p.getFileInfo()
+                    log("Planner", "getFileInfo")
+
+                    print("Plan generado satisfactoriamente...")
+                    tt.sleep(2)
+                    p = {"maquina": cliente, "plan": plan, "sintomas": sintomas}
+                    planes.append(p)
+                postServer(url[3], json.dumps(planes))
+                tt.sleep(1)
+                consumirServicio(
+                    tipo=1, url=url[0], text=json.dumps([{"server": "ok"}])
+                )
+                tt.sleep(2)
+                attempts = 0
+                segundos = 1
     except TypeError:
         attempts += 1
         segundos += 3
