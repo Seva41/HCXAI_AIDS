@@ -16,9 +16,11 @@ from Modulos.Executer.Executer import Executer
 config = configparser.ConfigParser()
 config.read("config.ini")
 
+FILE = config["CLIENTE"]["FILE"]
 MAQUINA = config["CLIENTE"]["MAQUINA"]
+MONITOREO = int(config["CLIENTE"]["SCAN_SEGUNDOS"])
 
-# server_address = ("localhost", 5555)  # Local
+server_address = ("localhost", 5555)  # Local
 url = [
     "tcp://localhost:5555",
     "http://localhost:5555/pushclientdone",
@@ -40,7 +42,33 @@ class Analyzer:
         self.ruta_registro_ataques = config["ANALYZER"]["RUTA_REGISTRO_ATAQUE"]
 
 
+def getFileData():
+    print("Obteniendo datos del archivo...")
+    data = []
+    data.append({"maquina": MAQUINA})
+    file = open(FILE, "r")
+    for linea in file:
+        info = linea.split()
+        t = (
+            info[1],
+            info[3],
+            info[5],
+            info[7],
+            info[9],
+        )  # [0] puerto, [1] tipo, [2] fecha, [3] hora, [4] ip
+        if t[1] == "DoS" or t[1] == "Fuzzers":
+            puerto = t[4]
+        else:
+            puerto = t[0]
+
+        dic = {"port": puerto, "tipo": t[1], "fecha": t[2], "hora": t[3], "ip": t[4]}
+        data.append(dic)
+    file.close()
+    return json.dumps(data)
+
+
 def consumirServicio(tipo, url, payload=None):
+    print("Consumiendo servicio...")
     try:
         if tipo == 1:
             headers = {"Content-type": "application/json", "Accept": "text/plain"}
@@ -57,6 +85,7 @@ def consumirServicio(tipo, url, payload=None):
 
 
 def log(componente, func):
+    print("Enviando log...")
     logData = []
     logData.append({"maquina": MAQUINA})
     now = dt.datetime.today()
@@ -66,10 +95,23 @@ def log(componente, func):
     logData.append(dic)
     payload = json.dumps(logData)
     headers = {"Content-type": "application/json", "Accept": "text/plain"}
-    r = requests.post(url[2], data=payload, headers=headers)
+
+    # Debug
+    print("Haciendo request...")
+    print(f"URL de solicitud: {url[2]}")
+    print(f"Datos de payload: {payload}")
+    print(f"Cabeceras: {headers}")
+
+    try:
+        r = requests.post(url[2], data=payload, headers=headers)
+        r.raise_for_status()  # Verificar si hay errores HTTP
+        print("Request hecho")
+    except requests.exceptions.RequestException as e:
+        print(f"Error en la solicitud: {e}")
 
 
 def cliente():
+    print("Iniciando cliente...")
     classifier = Classifier(maquina="Cliente_1")
     planner = Planner()
     analyzer = Analyzer()
@@ -83,6 +125,28 @@ def cliente():
         try:
             fila = consumirServicio(tipo=2, url=url[2])
             log("server", "consumirServicio")
+
+            print("Sensor")
+            s = Sensor()
+            s.sniff()
+            log("Sensor", "sniff")
+
+            print("Preprocessing")
+            pp = Preprocessing()
+            pp.callArgus()
+            log("Preprocessing", "callArgus")
+
+            print("Classifier")
+            m = Classifier(MAQUINA)
+            m.generateModels()
+            log("Classifier", "generateModels")
+
+            m.readFile()
+            log("Classifier", "readFile")
+
+            m.classifyData()
+            log("Classifier", "classifyData")
+
             if "" in fila:
                 fila.remove("")
             if fila == ["ok"]:

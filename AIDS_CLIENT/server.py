@@ -15,7 +15,7 @@ RUTA_REGISTRO_ATAQUES = config["ANALYZER"]["RUTA_ATAQUES_PROCESADOS"]
 RUTA_DATAINFO = config["SERVER"]["RUTA_DATA_INFO"]
 SERVER_LOG = config["SERVER"]["SERVER_LOG"]
 
-# server_address = ("localhost", 5555)
+server_address = ("localhost", 5555)
 url = [
     f"tcp://localhost:5555",
     f"http://localhost:5555/pushserverdone",
