@@ -1,17 +1,12 @@
-from Modulos.Analyzer.Analyzer import Analyzer
-from Modulos.Planner.Planner import Planner
 import datetime as dt
 import logging
-
+import socket
+import threading
 from urllib import request
 import requests
-import json
-import time as tt
-import os
 import configparser
-import socket
 
-local_ipv4 = socket.gethostbyname(socket.gethostname())
+# local_ipv4 = socket.gethostbyname(socket.gethostname())
 
 config = configparser.ConfigParser()
 config.read("config.ini")
@@ -19,11 +14,14 @@ config.read("config.ini")
 RUTA_REGISTRO_ATAQUES = config["ANALYZER"]["RUTA_ATAQUES_PROCESADOS"]
 RUTA_DATAINFO = config["SERVER"]["RUTA_DATA_INFO"]
 SERVER_LOG = config["SERVER"]["SERVER_LOG"]
+
+# server_address = ("localhost", 5555)
 url = [
-    f"http://{local_ipv4}:5555/pushserverdone",  # 0
-    f"http://{local_ipv4}:5555/plkpjhbx/",  # 1
-    f"http://{local_ipv4}:5555/filaclientes/fila_clientes.txt",  # 2
-    f"http://{local_ipv4}:5555/pushplan",  # 3
+    f"tcp://localhost:5555",
+    f"http://localhost:5555/pushserverdone",
+    f"http://localhost:5555/plkpjhbx/",
+    f"http://localhost:5555/filaclientes/fila_clientes.txt",
+    f"http://localhost:5555/pushplan",
 ]
 
 
@@ -86,10 +84,7 @@ def consumirServicio(tipo, url, text="x"):
         else:
             return "Error"
     except:
-        "Se cayó el servicio"
-
-
-#############
+        print("Se cayó el servicio")
 
 
 def postServer(url, data):
@@ -98,63 +93,33 @@ def postServer(url, data):
     return r.text
 
 
-attempts = 0
-segundos = 1
-while True:
-    planes = []
-    try:
-        fila = consumirServicio(tipo=2, url=url[2])
-        log("server", "consumirServicio")
+def manejar_cliente(client_socket, addr):
+    while True:
+        try:
+            data = client_socket.recv(1024)
+            if not data:
+                break
+            print(f"Datos recibidos: {data.decode()}")
+            # ...
+            client_socket.sendall(b"Datos recibidos correctamente")
+        except Exception as e:
+            print(f"Error al manejar cliente {addr}: {e}")
+            break
+    client_socket.close()
 
-        # Comprobación para evitar operaciones con None
-        if fila is not None:
-            if "" in fila:
-                fila.remove("")
-            if fila == ["ok"]:
-                print("Esperando...")
-                tt.sleep(2)
-            else:
-                for cliente in fila:
-                    data = consumirServicio(tipo=2, url=url[1] + cliente + ".txt")
-                    writeFile(data)
-                    log("server", "writeFile")
 
-                    print("Analyzer")
-                    an = Analyzer()
+with socket.socket(socket.AF_INET, socket.SOCK_STREAM) as server_socket:
+    server_socket.bind(server_address)
+    server_socket.listen()
 
-                    an.generateList()
-                    log("Analyzer", "generateList")
-                    an.writeDataCsv(tipo=1, mensaje="Generando registro de ataques...")
-                    log("Analyzer", "writeDataCsv")
-                    an.processData()
-                    log("Analyzer", "processData")
+    print(f"Servidor escuchando en {server_address}")
 
-                    print("Planner")
-                    print("\n\tGenerando plan para {}".format(cliente))
-                    p = Planner(RUTA_REGISTRO_ATAQUES, cliente)
-                    plan, sintomas = p.getFileInfo()
-                    log("Planner", "getFileInfo")
+    while True:
+        client_socket, addr = server_socket.accept()
+        print(f"Conexión aceptada de {addr}")
 
-                    print("Plan generado satisfactoriamente...")
-                    tt.sleep(2)
-                    p = {"maquina": cliente, "plan": plan, "sintomas": sintomas}
-                    planes.append(p)
-                postServer(url[3], json.dumps(planes))
-                tt.sleep(1)
-                consumirServicio(
-                    tipo=1, url=url[0], text=json.dumps([{"server": "ok"}])
-                )
-                tt.sleep(2)
-                attempts = 0
-                segundos = 1
-    except TypeError:
-        attempts += 1
-        segundos += 3
-        print("\n\nNo se puede establecer conexión con servicios web...")
-        print("Si el problema persiste contacte al administrador...")
-        print(
-            "Volviendo a intentar en {} segundos... Intentos: {}".format(
-                segundos, attempts
-            )
+        # hilo para manejar al cliente
+        client_thread = threading.Thread(
+            target=manejar_cliente, args=(client_socket, addr)
         )
-        tt.sleep(segundos)
+        client_thread.start()
