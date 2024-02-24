@@ -1,6 +1,6 @@
-import logging 
-import joblib #docs: https://joblib.readthedocs.io/en/latest/generated/joblib.load.html
-import pandas as pd #docs: https://pandas.pydata.org/docs/
+import logging
+import joblib  # docs: https://joblib.readthedocs.io/en/latest/generated/joblib.load.html
+import pandas as pd  # docs: https://pandas.pydata.org/docs/
 import threading
 import subprocess, sys
 import datetime as d
@@ -12,11 +12,15 @@ import configparser
 
 config = configparser.ConfigParser()
 config.read("config.ini")
-RUTA_SNIFF = config['CLASSIFIER']['RUTA_SNIFF']
-RUTA_LOG = config['CLASSIFIER']['RUTA_LOG']   
-RUTA_MODELS = config['CLASSIFIER']['RUTA_MODELS']
+RUTA_SNIFF = config["CLASSIFIER"]["RUTA_SNIFF"]
+RUTA_LOG = config["CLASSIFIER"]["RUTA_LOG"]
+RUTA_MODELS = config["CLASSIFIER"]["RUTA_MODELS"]
 
-url = ["http://192.168.0.103:5555/pushdatanew", "http://192.168.0.103:5555/pushdataappend"]
+url = [
+    "http://192.168.0.103:5555/pushdatanew",
+    "http://192.168.0.103:5555/pushdataappend",
+]
+
 
 class Classifier:
     def __init__(self, maquina):
@@ -33,11 +37,11 @@ class Classifier:
             os.remove(self.__rutaLog)
         except:
             pass
-        
+
         print("Clasificando data... Esto podría demorar un tiempo...")
         cont = 1
         for i in range(len(self.__df)):
-            df2 = self.__df.drop(columns =['port', 'source_ip'])
+            df2 = self.__df.drop(columns=["port", "source_ip"])
             a = df2.iloc[[i]]
             if self.__model.predict(a)[0] == 1:
                 multival = self.__modelo.predict(a)[0]
@@ -45,10 +49,10 @@ class Classifier:
                     multival = "Analysis"
                 elif multival == 1:
                     multival = "Backdoor"
-                elif multival == 2: 
-                    multival = 'DoS'
+                elif multival == 2:
+                    multival = "DoS"
                 elif multival == 3:
-                    multival = 'Exploits'
+                    multival = "Exploits"
                 elif multival == 4:
                     multival = "Fuzzers"
                 elif multival == 5:
@@ -61,68 +65,110 @@ class Classifier:
                     multival == "Worms"
                 threading.current_thread().name = multival
                 fecha, hora = self.__generateDate()
-                self.__logWebService(self.__df['port'].iloc[[i]].tolist()[0], multival, fecha, hora, self.__df['source_ip'].iloc[[i]].tolist()[0], cont)
+                self.__logWebService(
+                    self.__df["port"].iloc[[i]].tolist()[0],
+                    multival,
+                    fecha,
+                    hora,
+                    self.__df["source_ip"].iloc[[i]].tolist()[0],
+                    cont,
+                )
                 cont = 2 if cont == 1 else 2
-                self.__log(self.__df['port'].iloc[[i]].tolist()[0], multival, fecha, hora, self.__df['source_ip'].iloc[[i]].tolist()[0])
+                self.__log(
+                    self.__df["port"].iloc[[i]].tolist()[0],
+                    multival,
+                    fecha,
+                    hora,
+                    self.__df["source_ip"].iloc[[i]].tolist()[0],
+                )
         print("La data ha sido clasificada y respaldada en el servidor...")
-
 
     def generateModels(self):
         print("Generando modelos...")
-        self.__model = joblib.load(self.__rutaModels+"multiclass.pkl")
-        self.__modelo = joblib.load(self.__rutaModels+"modelmulti.pkl")
+        self.__model = joblib.load(self.__rutaModels + "multiclass.pkl")
+        self.__modelo = joblib.load(self.__rutaModels + "modelmulti.pkl")
 
     def readFile(self):
         print("Leyendo archivos...")
-        self.__df = pd.read_csv(self.__rutaSniff+"snif.csv", sep = '\s+')
-        self.__df.columns = ('source_ip','source_port','dest_ip','dest_port','protocol','state','duration','souce_bytes','dest_bytes','source_ttl','dest_ttl','source_loss','dest_loss','source_load','source_pkts','dest_pkts','source_win','dest_win','source_tcpb','dest_tcpb','source_meansz','dest_meansz','source_jit','dest_jit','start_time','last_time','source_intpkt','dest_intpkt','tcp_rtt','syn_ack','ack_syn','label')
+        self.__df = pd.read_csv(self.__rutaSniff + "snif.csv", sep="\s+")
+        self.__df.columns = (
+            "src_addr",
+            "dur",
+            "sMeanPktSz",
+            "src_bytes",
+            "ackdat",
+            "src_load",
+            "dst_load",
+            "dMeanPktSz",
+            "dst_port",
+            "src_port",
+            "proto",
+            "state",
+            "dst_bytes",
+            "src_ttl",
+            "dest_ttl",
+            "src_loss",
+            "dest_loss",
+            "src_pkts",
+            "dest_pkts",
+            "src_win",
+            "dest_win",
+            "src_tcp_base",
+            "dest_tcp_base",
+            "src_jit",
+            "dest_jit",
+            "start_time",
+            "last_time",
+            "src_int_pkt",
+            "dest_int_pkt",
+            "tcp_rtt",
+            "synack",
+            "label",
+        )
         a = 0
         for i in self.__df.columns:
             a = a + 1
         print("Número de columnas: ", a)
         self.__df = self.__df.dropna()
-        
-        #self.__df['sload'] = pd.to_numeric(self.__df['sload'])
-        #self.__df['dload'] = pd.to_numeric(self.__df['dload'])
+
+        # self.__df['sload'] = pd.to_numeric(self.__df['sload'])
+        # self.__df['dload'] = pd.to_numeric(self.__df['dload'])
         self.__df = self.__df[self.__df.dur != 0]
 
     def __log(self, port, aType, date, hora, ip):
-        logger = logging.getLogger('localhost')
+        logger = logging.getLogger("localhost")
         logger.setLevel(logging.DEBUG)
         handler = logging.FileHandler(self.__rutaLog)
         logger.addHandler(handler)
-        if (logger.hasHandlers()):
+        if logger.hasHandlers():
             logger.handlers.clear()
         logger.addHandler(handler)
-        logger.debug('Port: {} \t Tipo: {} \t Fecha: {} \t Hora: {} \t IP: {}'.format(port, aType, date, hora, ip))
+        logger.debug(
+            "Port: {} \t Tipo: {} \t Fecha: {} \t Hora: {} \t IP: {}".format(
+                port, aType, date, hora, ip
+            )
+        )
 
     def __logWebService(self, port, aType, date, hora, ip, mode):
-        #mode = 1: cuando es la primera vez que se ejecuta la función
-        #mode = 2: cuando no es la primera vez que se ejecuta
+        # mode = 1: cuando es la primera vez que se ejecuta la función
+        # mode = 2: cuando no es la primera vez que se ejecuta
         data = []
         data.append({"maquina": self.__maquina})
-        dic = {
-            "Port": port,
-            "Tipo": aType,
-            "Fecha": date,
-            "Hora": hora,
-            "IP": ip
-        }
+        dic = {"Port": port, "Tipo": aType, "Fecha": date, "Hora": hora, "IP": ip}
         data.append(dic)
         payload = json.dumps(data)
-        headers = {'Content-type': 'application/json', 'Accept': 'text/plain'} 
+        headers = {"Content-type": "application/json", "Accept": "text/plain"}
         if mode == 1:
             r = requests.post(url[0], data=payload, headers=headers)
             print(r.text)
         elif mode >= 2:
             r = requests.post(url[1], data=payload, headers=headers)
-            print (r.text)
+            print(r.text)
         else:
             pass
 
     def __generateDate(self):
         now = d.datetime.today()
-        fecha = str(now.day)+"/"+str(now.month)+"/"+str(now.year)
+        fecha = str(now.day) + "/" + str(now.month) + "/" + str(now.year)
         hora = now.strftime("%H:%M:%S")
         return fecha, hora
-
