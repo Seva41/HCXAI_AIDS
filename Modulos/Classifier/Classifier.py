@@ -92,48 +92,111 @@ class Classifier:
         print("Leyendo archivos...")
         self.__df = pd.read_csv(self.__rutaSniff + "snif.csv", sep="\s+")
         self.__df.columns = (
-            "src_addr",
-            "dur",
-            "sMeanPktSz",
-            "src_bytes",
-            "ackdat",
-            "src_load",
-            "dst_load",
-            "dMeanPktSz",
-            "dst_port",
-            "src_port",
-            "proto",
-            "state",
-            "dst_bytes",
-            "src_ttl",
-            "dest_ttl",
-            "src_loss",
-            "dest_loss",
-            "src_pkts",
-            "dest_pkts",
-            "src_win",
-            "dest_win",
-            "src_tcp_base",
-            "dest_tcp_base",
-            "src_jit",
-            "dest_jit",
-            "start_time",
-            "last_time",
-            "src_int_pkt",
-            "dest_int_pkt",
-            "tcp_rtt",
-            "synack",
-            "label",
+            "src_addr",  # 1
+            "dst_addr",  # 3
+            "dur",  # 7
+            "sMeanPktSz",  # 23
+            "src_bytes",  # 8
+            "ackdat",  # 35
+            "src_load",  # 15
+            "dst_load",  # 16
+            "dMeanPktSz",  # 24
+            "dst_port",  # 4
+            "src_port",  # 2
+            "proto",  # 5
+            "state",  # 6
+            "dst_bytes",  # 9
+            "src_ttl",  # 10
+            "dest_ttl",  # 11
+            "src_loss",  # 12
+            "dest_loss",  # 13
+            "src_pkts",  # 17
+            "dest_pkts",  # 18
+            "src_win",  # 19
+            "dest_win",  # 20
+            "src_tcp_base",  # 21
+            "dest_tcp_base",  # 22
+            "src_jit",  # 27
+            "dest_jit",  # 28
+            "start_time",  # 29
+            "last_time",  # 30
+            "src_int_pkt",  # 31
+            "dest_int_pkt",  # 32
+            "tcp_rtt",  # 33
+            "synack",  # 34
+            "label",  # 49
+            # Nuevas
+            "is_sm_ips_ports",  # 36
+            # "ct_state_ttl",  # 37
+            # "ct_flw_http_mthd",  # 38
+            # "ct_ftp_cmd",  # 40
+            # "ct_srv_src",  # 41
+            # "ct_srv_dst",  # 42
+            "ct_dst_ltm",  # 43
+            "ct_src_ltm",  # 44
+            "ct_src_dport_ltm",  # 45
+            "ct_dst_sport_ltm",  # 46
+            "ct_dst_src_ltm",  # 47
         )
-        a = 0
-        for i in self.__df.columns:
-            a = a + 1
-        print("Número de columnas: ", a)
-        self.__df = self.__df.dropna()
+        a = len(self.__df.columns)
 
-        # self.__df['sload'] = pd.to_numeric(self.__df['sload'])
-        # self.__df['dload'] = pd.to_numeric(self.__df['dload'])
-        self.__df = self.__df[self.__df.dur != 0]
+    print("Número de columnas: ", a)
+    self.__df.dropna(inplace=True)
+
+    # Cambiar a numerico
+    self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
+    self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
+
+    # Calculate is_sm_ips_ports
+    self.__df["is_sm_ips_ports"] = (
+        (self.__df["src_addr"] == self.__df["dst_addr"])
+        & (self.__df["src_port"] == self.__df["dst_port"])
+    ).astype(
+        int
+    )  # 36
+
+    # Leer ultimos 100 registros basados en last_time (30)
+    self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
+
+    self.__df["ct_dst_ltm"] = self.__df.apply(
+        lambda row: self.__df_last[
+            (self.__df_last["dst_addr"] == row["dst_addr"])
+        ].shape[0],
+        axis=1,
+    )  # 43
+
+    self.__df["ct_src_ltm"] = self.__df.apply(
+        lambda row: self.__df_last[
+            (self.__df_last["src_addr"] == row["src_addr"])
+        ].shape[0],
+        axis=1,
+    )  # 44
+
+    self.__df["ct_src_dport_ltm"] = self.__df.apply(
+        lambda row: self.__df_last[
+            (self.__df_last["src_addr"] == row["src_addr"])
+            & (self.__df_last["dst_port"] == row["dst_port"])
+        ].shape[0],
+        axis=1,
+    )  # 45
+
+    self.__df["ct_dst_sport_ltm"] = self.__df.apply(
+        lambda row: self.__df_last[
+            (self.__df_last["dst_addr"] == row["dst_addr"])
+            & (self.__df_last["src_port"] == row["src_port"])
+        ].shape[0],
+        axis=1,
+    )  # 46
+
+    self.__df["ct_dst_src_ltm"] = self.__df.apply(
+        lambda row: self.__df_last[
+            (self.__df_last["src_addr"] == row["src_addr"])
+            & (self.__df_last["dst_addr"] == row["dst_addr"])
+        ].shape[0],
+        axis=1,
+    )  # 47
+
+    self.__df = self.__df[self.__df.dur != 0]
 
     def __log(self, port, aType, date, hora, ip):
         logger = logging.getLogger("localhost")
