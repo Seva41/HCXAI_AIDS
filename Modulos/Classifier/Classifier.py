@@ -140,63 +140,63 @@ class Classifier:
         )
         a = len(self.__df.columns)
 
-    print("Número de columnas: ", a)
-    self.__df.dropna(inplace=True)
+        #print("Número de columnas: ", a)
+        self.__df.dropna(inplace=True)
 
-    # Cambiar a numerico
-    self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
-    self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
+        # Cambiar a numerico
+        self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
+        self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
 
-    # Calculate is_sm_ips_ports
-    self.__df["is_sm_ips_ports"] = (
-        (self.__df["src_addr"] == self.__df["dst_addr"])
-        & (self.__df["src_port"] == self.__df["dst_port"])
-    ).astype(
-        int
-    )  # 36
+        # Calculate is_sm_ips_ports
+        self.__df["is_sm_ips_ports"] = (
+            (self.__df["src_addr"] == self.__df["dst_addr"])
+            & (self.__df["src_port"] == self.__df["dst_port"])
+        ).astype(
+            int
+        )  # 36
 
-    # Leer ultimos 100 registros basados en last_time (30)
-    self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
+        # Leer ultimos 100 registros basados en last_time (30)
+        self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
 
-    self.__df["ct_dst_ltm"] = self.__df.apply(
-        lambda row: self.__df_last[
-            (self.__df_last["dst_addr"] == row["dst_addr"])
-        ].shape[0],
-        axis=1,
-    )  # 43
+        self.__df["ct_dst_ltm"] = self.__df.apply(
+            lambda row: self.__df_last[
+                (self.__df_last["dst_addr"] == row["dst_addr"])
+            ].shape[0],
+            axis=1,
+        )  # 43
 
-    self.__df["ct_src_ltm"] = self.__df.apply(
-        lambda row: self.__df_last[
-            (self.__df_last["src_addr"] == row["src_addr"])
-        ].shape[0],
-        axis=1,
-    )  # 44
+        self.__df["ct_src_ltm"] = self.__df.apply(
+            lambda row: self.__df_last[
+                (self.__df_last["src_addr"] == row["src_addr"])
+            ].shape[0],
+            axis=1,
+        )  # 44
 
-    self.__df["ct_src_dport_ltm"] = self.__df.apply(
-        lambda row: self.__df_last[
-            (self.__df_last["src_addr"] == row["src_addr"])
-            & (self.__df_last["dst_port"] == row["dst_port"])
-        ].shape[0],
-        axis=1,
-    )  # 45
+        self.__df["ct_src_dport_ltm"] = self.__df.apply(
+            lambda row: self.__df_last[
+                (self.__df_last["src_addr"] == row["src_addr"])
+                & (self.__df_last["dst_port"] == row["dst_port"])
+            ].shape[0],
+            axis=1,
+        )  # 45
 
-    self.__df["ct_dst_sport_ltm"] = self.__df.apply(
-        lambda row: self.__df_last[
-            (self.__df_last["dst_addr"] == row["dst_addr"])
-            & (self.__df_last["src_port"] == row["src_port"])
-        ].shape[0],
-        axis=1,
-    )  # 46
+        self.__df["ct_dst_sport_ltm"] = self.__df.apply(
+            lambda row: self.__df_last[
+                (self.__df_last["dst_addr"] == row["dst_addr"])
+                & (self.__df_last["src_port"] == row["src_port"])
+            ].shape[0],
+            axis=1,
+        )  # 46
 
-    self.__df["ct_dst_src_ltm"] = self.__df.apply(
-        lambda row: self.__df_last[
-            (self.__df_last["src_addr"] == row["src_addr"])
-            & (self.__df_last["dst_addr"] == row["dst_addr"])
-        ].shape[0],
-        axis=1,
-    )  # 47
+        self.__df["ct_dst_src_ltm"] = self.__df.apply(
+            lambda row: self.__df_last[
+                (self.__df_last["src_addr"] == row["src_addr"])
+                & (self.__df_last["dst_addr"] == row["dst_addr"])
+            ].shape[0],
+            axis=1,
+        )  # 47
 
-    self.__df = self.__df[self.__df.dur != 0]
+        self.__df = self.__df[self.__df.dur != 0]
 
     def __log(self, port, aType, date, hora, ip):
         logger = logging.getLogger("localhost")
