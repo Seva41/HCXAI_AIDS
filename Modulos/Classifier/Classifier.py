@@ -90,7 +90,7 @@ class Classifier:
 
     def readFile(self):
         print("Leyendo archivos...")
-        self.__df = pd.read_csv(self.__rutaSniff + "snif.csv", sep="\s+")
+        self.__df = pd.read_csv(self.__rutaSniff + "snif.csv", sep=",")
         self.__df.columns = (
             "src_addr",  # 1
             "dst_addr",  # 3
@@ -125,9 +125,6 @@ class Classifier:
             "tcp_rtt",  # 33
             "synack",  # 34
             "label",  # 49
-        )
-
-        nuevas_features = [
             "is_sm_ips_ports",  # 36
             # "ct_state_ttl",
             # "ct_flw_http_mthd",
@@ -139,13 +136,13 @@ class Classifier:
             "ct_src_dport_ltm",  # 45
             "ct_dst_sport_ltm",  # 46
             "ct_dst_src_ltm",  # 47
-        ]
+        )
 
         self.__df.dropna(inplace=True)
 
         self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
         self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
-
+        '''
         self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
 
         for feature in nuevas_features:
@@ -181,7 +178,7 @@ class Classifier:
 
         for feature in nuevas_features:
             self.__df[feature] = self.__df[feature].astype(int)
-
+        '''
         self.__df = self.__df[self.__df.dur != 0]
 
 
