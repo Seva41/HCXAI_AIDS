@@ -140,23 +140,20 @@ class Classifier:
             "ct_dst_sport_ltm",  # 46
             "ct_dst_src_ltm",  # 47
         ]
-        # a = len(self.__df.columns)
-        # print("Número de columnas: ", a)
+
         self.__df.dropna(inplace=True)
 
-        # Cambiar a numerico
         self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
         self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
 
-        self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(
-            100
-        )
+        self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
+
+        for feature in nuevas_features:
+            self.__df[feature] = 0
 
         for index, row in self.__df.iterrows():
-
             self.__df.at[index, "is_sm_ips_ports"] = int(
-                (row["src_addr"] == row["dst_addr"])
-                and (row["src_port"] == row["dst_port"])
+                (row["src_addr"] == row["dst_addr"]) and (row["src_port"] == row["dst_port"])
             )
 
             self.__df.at[index, "ct_dst_ltm"] = self.__df_last[
@@ -186,6 +183,7 @@ class Classifier:
             self.__df[feature] = self.__df[feature].astype(int)
 
         self.__df = self.__df[self.__df.dur != 0]
+
 
     def __log(self, port, aType, date, hora, ip):
         logger = logging.getLogger("localhost")

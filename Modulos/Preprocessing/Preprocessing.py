@@ -21,5 +21,6 @@ class Preprocessing:
             # Agregar features calculables
 
             # Sacar values
+            
             with open("snif.csv", "w+") as outputdata:
                 outputdata.write(inputdata.read().replace("*", ""))
