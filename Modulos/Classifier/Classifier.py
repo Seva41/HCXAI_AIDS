@@ -125,76 +125,65 @@ class Classifier:
             "tcp_rtt",  # 33
             "synack",  # 34
             "label",  # 49
-            # Nuevas
+        )
+
+        nuevas_features = [
             "is_sm_ips_ports",  # 36
-            # "ct_state_ttl",  # 37
-            # "ct_flw_http_mthd",  # 38
-            # "ct_ftp_cmd",  # 40
-            # "ct_srv_src",  # 41
-            # "ct_srv_dst",  # 42
+            # "ct_state_ttl",
+            # "ct_flw_http_mthd",
+            # "ct_ftp_cmd",
+            # "ct_srv_src",
+            # "ct_srv_dst",
             "ct_dst_ltm",  # 43
             "ct_src_ltm",  # 44
             "ct_src_dport_ltm",  # 45
             "ct_dst_sport_ltm",  # 46
             "ct_dst_src_ltm",  # 47
-        )
-        a = len(self.__df.columns)
-
-        #print("Número de columnas: ", a)
+        ]
+        # a = len(self.__df.columns)
+        # print("Número de columnas: ", a)
         self.__df.dropna(inplace=True)
 
         # Cambiar a numerico
         self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
         self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
 
-        # Calculate is_sm_ips_ports
-        self.__df["is_sm_ips_ports"] = (
-            (self.__df["src_addr"] == self.__df["dst_addr"])
-            & (self.__df["src_port"] == self.__df["dst_port"])
-        ).astype(
-            int
-        )  # 36
+        self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(
+            100
+        )
 
-        # Leer ultimos 100 registros basados en last_time (30)
-        self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
+        for index, row in self.__df.iterrows():
 
-        self.__df["ct_dst_ltm"] = self.__df.apply(
-            lambda row: self.__df_last[
-                (self.__df_last["dst_addr"] == row["dst_addr"])
-            ].shape[0],
-            axis=1,
-        )  # 43
+            self.__df.at[index, "is_sm_ips_ports"] = int(
+                (row["src_addr"] == row["dst_addr"])
+                and (row["src_port"] == row["dst_port"])
+            )
 
-        self.__df["ct_src_ltm"] = self.__df.apply(
-            lambda row: self.__df_last[
-                (self.__df_last["src_addr"] == row["src_addr"])
-            ].shape[0],
-            axis=1,
-        )  # 44
+            self.__df.at[index, "ct_dst_ltm"] = self.__df_last[
+                self.__df_last["dst_addr"] == row["dst_addr"]
+            ].shape[0]
 
-        self.__df["ct_src_dport_ltm"] = self.__df.apply(
-            lambda row: self.__df_last[
+            self.__df.at[index, "ct_src_ltm"] = self.__df_last[
+                self.__df_last["src_addr"] == row["src_addr"]
+            ].shape[0]
+
+            self.__df.at[index, "ct_src_dport_ltm"] = self.__df_last[
                 (self.__df_last["src_addr"] == row["src_addr"])
                 & (self.__df_last["dst_port"] == row["dst_port"])
-            ].shape[0],
-            axis=1,
-        )  # 45
+            ].shape[0]
 
-        self.__df["ct_dst_sport_ltm"] = self.__df.apply(
-            lambda row: self.__df_last[
+            self.__df.at[index, "ct_dst_sport_ltm"] = self.__df_last[
                 (self.__df_last["dst_addr"] == row["dst_addr"])
                 & (self.__df_last["src_port"] == row["src_port"])
-            ].shape[0],
-            axis=1,
-        )  # 46
+            ].shape[0]
 
-        self.__df["ct_dst_src_ltm"] = self.__df.apply(
-            lambda row: self.__df_last[
+            self.__df.at[index, "ct_dst_src_ltm"] = self.__df_last[
                 (self.__df_last["src_addr"] == row["src_addr"])
                 & (self.__df_last["dst_addr"] == row["dst_addr"])
-            ].shape[0],
-            axis=1,
-        )  # 47
+            ].shape[0]
+
+        for feature in nuevas_features:
+            self.__df[feature] = self.__df[feature].astype(int)
 
         self.__df = self.__df[self.__df.dur != 0]
 
