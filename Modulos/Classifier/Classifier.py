@@ -136,13 +136,15 @@ class Classifier:
             "ct_src_dport_ltm",  # 45
             "ct_dst_sport_ltm",  # 46
             "ct_dst_src_ltm",  # 47
+            "service",
         )
 
         self.__df.dropna(inplace=True)
 
         self.__df["src_load"] = pd.to_numeric(self.__df["src_load"])  # 15
         self.__df["dst_load"] = pd.to_numeric(self.__df["dst_load"])  # 16
-        '''
+
+        """ Para hacer cálculo de nuevas features sin CSV
         self.__df_last = self.__df.sort_values(by="last_time", ascending=False).head(100)
 
         for feature in nuevas_features:
@@ -178,9 +180,8 @@ class Classifier:
 
         for feature in nuevas_features:
             self.__df[feature] = self.__df[feature].astype(int)
-        '''
+        """
         self.__df = self.__df[self.__df.dur != 0]
-
 
     def __log(self, port, aType, date, hora, ip):
         logger = logging.getLogger("localhost")
