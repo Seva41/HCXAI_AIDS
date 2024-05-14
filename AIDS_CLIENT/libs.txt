@@ -1,8 +1,0 @@
-pandas
-scapy
-graypy
-joblib
-scikit-learn
-xgboost==1.2.0
-numpy==1.19.3
-requests
